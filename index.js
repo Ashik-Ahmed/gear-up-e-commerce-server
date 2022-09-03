@@ -18,6 +18,7 @@ async function run() {
     try {
         await client.connect();
         const productsCollection = client.db('gear-up').collection('products');
+        const orderCollection = client.db('gear-up').collection('orders');
 
 
         //get all products
@@ -36,6 +37,32 @@ async function run() {
 
             const cursor = await productsCollection.findOne(query);
             res.send(cursor);
+        })
+
+        // update a product by id 
+        app.put('/update-product/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedProduct = req.body;
+            const filter = { _id: ObjectId(id) };
+            const updatedDoc = {
+                $set: {
+                    quantity: updatedProduct.quantity,
+                }
+            };
+
+            // console.log('updatedProduct:', updatedProduct);
+            // console.log('updatedDoc:', updatedDoc);
+
+            const result = await productsCollection.updateOne(filter, updatedDoc);
+            res.send(result);
+        })
+
+        //add a new order
+        app.post('/confirm-purchase', async (req, res) => {
+            const orderDetails = req.body;
+            const result = await orderCollection.insertOne(orderDetails);
+
+            res.send(result);
         })
 
     }
