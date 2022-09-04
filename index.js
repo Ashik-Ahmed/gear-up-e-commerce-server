@@ -106,7 +106,7 @@ async function run() {
         })
 
 
-        //create a new user
+        //create and update a user
         app.put('/create-user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
