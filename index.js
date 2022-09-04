@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+var jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
 require('dotenv').config();
 
@@ -7,6 +8,22 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+//JWT
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'Unauthorized Access' });
+    }
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).send({ message: 'Forbidden Access' });
+        }
+        req.decoded = decoded;
+        next();
+    })
+}
 
 
 
@@ -19,6 +36,7 @@ async function run() {
         await client.connect();
         const productsCollection = client.db('gear-up').collection('products');
         const orderCollection = client.db('gear-up').collection('orders');
+        const userCollection = client.db('gear-up').collection('users');
 
 
         //get all products
@@ -52,6 +70,7 @@ async function run() {
 
             // console.log('updatedProduct:', updatedProduct);
             // console.log('updatedDoc:', updatedDoc);
+            // console.log(id);
 
             const result = await productsCollection.updateOne(filter, updatedDoc);
             res.send(result);
@@ -84,6 +103,34 @@ async function run() {
             const orders = await cursor.toArray();
 
             res.send(orders)
+        })
+
+
+        //create a new user
+        app.put('/create-user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+
+            const filter = { email: email };
+            const options = { upsert: true };
+
+            const updatedDoc = {
+                $set: user,
+            };
+
+            const result = await userCollection.updateOne(filter, updatedDoc, options);
+            const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10d' });
+            res.send({ result, token });
+
+        })
+
+        //get a single user from DB
+        app.get('/user', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+
+            const result = await userCollection.findOne(query);
+            res.send(result)
         })
 
     }
