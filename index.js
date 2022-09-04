@@ -94,11 +94,15 @@ async function run() {
 
         })
 
-        //get orders by user email
-        app.get('/my-orders', async (req, res) => {
+        //get all orders and also specific user by email
+        app.get('/orders', async (req, res) => {
             const email = req.query.email;
 
-            const query = { customerEmail: email };
+            let query = {};
+
+            if (email) {
+                query = { customerEmail: email };
+            }
             const cursor = orderCollection.find(query);
             const orders = await cursor.toArray();
 
@@ -121,7 +125,6 @@ async function run() {
             const result = await userCollection.updateOne(filter, updatedDoc, options);
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10d' });
             res.send({ result, token });
-
         })
 
         //get a single user from DB
@@ -131,6 +134,16 @@ async function run() {
 
             const result = await userCollection.findOne(query);
             res.send(result)
+        })
+
+        //get all users from db
+        app.get('/users', async (req, res) => {
+            const query = {};
+
+            const cursor = userCollection.find(query);
+            const users = await cursor.toArray();
+
+            res.send(users);
         })
 
     }
