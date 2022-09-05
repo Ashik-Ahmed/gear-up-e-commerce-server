@@ -37,6 +37,7 @@ async function run() {
         const productsCollection = client.db('gear-up').collection('products');
         const orderCollection = client.db('gear-up').collection('orders');
         const userCollection = client.db('gear-up').collection('users');
+        const reviewCollection = client.db('gear-up').collection('reviews');
 
 
         //get all products
@@ -46,6 +47,14 @@ async function run() {
             const cursor = productsCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
+        })
+
+        //add a new product
+        app.post('/add-product', async (req, res) => {
+            const product = req.body;
+
+            const result = await productsCollection.insertOne(product);
+            res.send(result);
         })
 
         //get a single products by id
@@ -74,6 +83,16 @@ async function run() {
 
             const result = await productsCollection.updateOne(filter, updatedDoc);
             res.send(result);
+        })
+
+        //delete a product
+        app.delete('/delete-product', async (req, res) => {
+            const id = req.query.id;
+            const query = { _id: ObjectId(id) };
+
+            const result = await productsCollection.deleteOne(query);
+            res.send(result);
+
         })
 
         //add a new order
@@ -144,6 +163,14 @@ async function run() {
             const users = await cursor.toArray();
 
             res.send(users);
+        })
+
+        //add a review
+        app.post('/add-review', async (req, res) => {
+            const review = req.body;
+
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
         })
 
     }
