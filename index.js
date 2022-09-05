@@ -57,7 +57,7 @@ async function run() {
             res.send(result);
         })
 
-        //get a single products by id
+        //get a single product by id
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
@@ -126,6 +126,15 @@ async function run() {
             const orders = await cursor.toArray();
 
             res.send(orders)
+        })
+
+        //get a single order by id
+        app.get('/order', async (req, res) => {
+            const id = req.query.id;
+            const query = { _id: ObjectId(id) };
+
+            const order = await orderCollection.findOne(query);
+            res.send(order);
         })
 
 
