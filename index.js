@@ -158,12 +158,12 @@ async function run() {
         //update shipping of an order
         app.patch('/update-shipping/:id', async (req, res) => {
             const id = req.params.id;
-            const shipping = req.body;
+            const updatedOrder = req.body;
             const filter = { _id: ObjectId(id) };
 
             const updatedDoc = {
                 $set: {
-                    shipping
+                    shipment: updatedOrder.shipping
                 }
             }
 
