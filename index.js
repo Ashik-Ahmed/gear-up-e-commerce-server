@@ -138,7 +138,7 @@ async function run() {
             res.send(order);
         })
 
-        //update an order
+        //update payment info of an order
         app.patch('/order-payment/:id', async (req, res) => {
             const id = req.params.id;
             const payment = req.body;
@@ -153,6 +153,22 @@ async function run() {
 
             const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
             res.end(updatedOrder);
+        })
+
+        //update shipping of an order
+        app.patch('/update-shipping/:id', async (req, res) => {
+            const id = req.params.id;
+            const shipping = req.body;
+            const filter = { _id: ObjectId(id) };
+
+            const updatedDoc = {
+                $set: {
+                    shipping
+                }
+            }
+
+            const updateOrder = await orderCollection.updateOne(filter, updatedDoc);
+            res.send(updateOrder)
         })
 
 
