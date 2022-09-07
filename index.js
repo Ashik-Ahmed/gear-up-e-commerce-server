@@ -129,6 +129,15 @@ async function run() {
             res.send(orders)
         })
 
+        //get orders by payment status
+        app.get('/orders/payment', async (req, res) => {
+            const payment = req.params;
+            const query = { payment };
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders);
+        })
+
         //get a single order by id
         app.get('/order', async (req, res) => {
             const id = req.query.id;
