@@ -50,6 +50,14 @@ async function run() {
             res.send(products);
         })
 
+
+        //test api to get random 2 products
+        // app.get('/random', async (req, res) => {
+        //     const products = productsCollection.aggregate([{ $sample: { size: 2 } }]);
+        //     const result = await products.toArray();
+        //     res.send(result);
+        // })
+
         //add a new product
         app.post('/add-product', async (req, res) => {
             const product = req.body;
